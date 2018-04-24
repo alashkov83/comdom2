@@ -51,30 +51,32 @@ class DataNotObserved(ValueError):
     pass
 
 
-def create_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', type=str,
-                        default=None, help='Номер первой группы')
-    parser.add_argument('-g2', '--group2', type=int,
-                        help='Номер второй группы')
-    parser.add_argument('-d', '--dist', type=float,
-                        default=0.1, help='Расстояние между окнами (нм)')
-    parser.add_argument('-b', '--begin', type=int,
-                        default=0, help='Номер первого фрейма')
-    parser.add_argument('-e', '--end', type=int, default=0,
-                        help='Номер последнего фрейма')
-    parser.add_argument('-g1', '--group1', type=int,
-                        help='Номер первой группы')
-    parser.add_argument('-g2', '--group2', type=int,
-                        help='Номер второй группы')
-    parser.add_argument('-d', '--dist', type=float,
-                        default=0.1, help='Расстояние между окнами (нм)')
-    parser.add_argument('-b', '--begin', type=int,
-                        default=0, help='Номер первого фрейма')
-    parser.add_argument('-e', '--end', type=int, default=0,
-                        help='Номер последнего фрейма')
+class Parser(argparse.ArgumentParser):
+    def __init__(self):
+        super().__init__()
+        self.parser_setup()
 
-    return parser
+    def parser_setup(self):
+        self.add_argument('-i', '--input', type=str,
+                          default='', help='Input file name (pdb)')
+        self.add_argument('-s1', '--segment1', type=str,
+                          help='Ranges of residues in domain No 1')
+        self.add_argument('-s2', '--segment2', type=str,
+                          help='Ranges of residues in domain No 2')
+        self.add_argument('-g', '--gui', choices=['tkgui', 'cli'], type=str, default='tkgui',
+                          help='UI modes')
+        self.add_argument('-hd', '--hydrofob', action='store_const', const=True, default=False,
+                          help='Only hydrophobic residues.')
+        self.add_argument('-n', '--n_cluster', type=int, default=0,
+                          help='Number of clusters for clustering. 0 (default) for MeanShift algorithm')
+        self.add_argument('-o', '--output', type=str,
+                          default='', help='Output file name (dat, xsl, xslx)')
+        self.add_argument('-oc', '--ocluster', type=str,
+                          default='', help='Output file name for clustering histogram'
+                                           ' (eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff)')
+        self.add_argument('-of', '--ofigure', type=str,
+                          default='', help='Output file name for graphic'
+                                           ' (eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff)')
 
 
 def joke():
@@ -1268,10 +1270,10 @@ class TkGui(tk.Tk):
 
 
 if __name__ == '__main__':
-    parser = create_parser()
+    parser = Parser()
     namespace = parser.parse_args()
-    if namespace.gui:
+    if namespace.gui == 'tkgui':
         gui = TkGui(namespace)
         gui.mainloop()
-    else:
+    elif namespace.gui == 'cli':
         cli = Cli(namespace)
