@@ -14,31 +14,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from .joke import joke
-from .mainapp import App
-
-
-class XLSWImportError(ImportError):
-    pass
-
-
-class XLWTImportError(ImportError):
-    pass
-
-
-class BadExtError(FileNotFoundError):
-    pass
-
-
-class NoDataFor1stDom(AttributeError):
-    pass
-
-
-class NoDataFor2ndDom(AttributeError):
-    pass
-
-
-class DataNotObserved(ValueError):
-    pass
+from .mainapp import App, XLSWImportError, XLWTImportError, BadExtError, NoDataFor1stDom, NoDataFor2ndDom, \
+    DataNotObserved
 
 
 class Cli:
