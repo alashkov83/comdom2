@@ -36,14 +36,15 @@ class Parser(argparse.ArgumentParser):
                                            ' (eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff)')
 
 
-
 if __name__ == '__main__':
     parser = Parser()
     namespace = parser.parse_args()
     if namespace.gui == 'tkgui':
         from comdom2.tkgui import TkGui
+
         gui = TkGui(namespace)
         gui.mainloop()
     elif namespace.gui == 'cli':
         from comdom2.cli import Cli
+
         cli = Cli(namespace)
