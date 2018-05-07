@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+# Installer logs
+# Unit test / coverage reports
+# Translations
+# Django stuff:
+# Flask stuff:
+# Scrapy stuff:
+# Sphinx documentation
+# PyBuilder
+# IPython Notebook
+# pyenv
+# celery beat schedule file
+# dotenv
+# virtualenv
+# Spyder project settings
+.spyproject/
+# Rope project settings
+#PyCharm projekt settings
+.idea/
+
+#kdevelop4 project settings
+md_utils.kdev4
+.kdev4/
+
+#xscode settings
+.vscode/
+Будет удалено comdom2/comdom2/__pycache__/
+/comdom2/test.pdb
+Будет удалено comdom.py
+Будет удалено comdom2/test.pdb
+Будет удалено comdom_tk.py
