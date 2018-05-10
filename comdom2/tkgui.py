@@ -25,7 +25,7 @@ from .mainapp import App, XLSWImportError, XLWTImportError, BadExtError, NoDataF
 
 
 class TkGui(tk.Tk):
-    """ГУЙ"""
+    """GUI"""
 
     def __init__(self, namespace):
         super().__init__()
@@ -35,11 +35,11 @@ class TkGui(tk.Tk):
         self.menu()
         fra1 = ttk.Frame(self)
         fra1.grid(row=0, rowspan=2, column=0)
-        lab1 = ttk.LabelFrame(fra1, text='Первый домен', labelanchor='n', borderwidth=5)
+        lab1 = ttk.LabelFrame(fra1, text='The first domain', labelanchor='n', borderwidth=5)
         lab1.grid(row=0, column=0, pady=5, padx=5)
-        but1 = ttk.Button(lab1, text='Добавить диапазон а.о.', command=self.seg1)
+        but1 = ttk.Button(lab1, text='Add a range', command=self.seg1)
         but1.grid(row=0, column=0, padx=10)
-        but12 = ttk.Button(lab1, text='Сброс', command=self.sbros_1)
+        but12 = ttk.Button(lab1, text='Reset', command=self.sbros_1)
         but12.grid(row=0, column=1, padx=10)
         fra11 = ttk.Frame(fra1)
         fra11.grid(row=1, column=0, pady=10, padx=10)

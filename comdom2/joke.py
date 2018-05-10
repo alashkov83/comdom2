@@ -11,7 +11,7 @@ import random
 
 
 def joke():
-    """Шутка юмора :-)"""
+    """Joke humor :-)"""
     joke_txt = [
         "There are 10 types of people in the world: those who understand binary, and those who don't\n",
         "If at first you don't succeed; call it version 1.0\n",

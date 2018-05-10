@@ -111,7 +111,7 @@ class DataNotObserved(ValueError):
 
 
 class App:
-    """Класс логики работы программы"""
+    """Class of program logic"""
 
     def __init__(self):
         self.segment_1 = []
@@ -122,7 +122,7 @@ class App:
 
     @staticmethod
     def _cmass(str_nparray: np.ndarray) -> list:
-        """Вычисление положения центра массс"""
+        """Compute the position of the center of mass"""
         mass_sum = float(str_nparray[:, 3].sum())
         mx = (str_nparray[:, 3]) * (str_nparray[:, 0])
         my = (str_nparray[:, 3]) * (str_nparray[:, 1])
@@ -147,7 +147,7 @@ class App:
         return elements.get(element, round(formula(element).mass))
 
     def stat(self):
-        """Большая ложь т.е. статистика"""
+        """Big lie ie statistics"""
         if self.nparray is None:
             raise ValueError
         t = self.nparray[:, 0]
@@ -264,7 +264,7 @@ class App:
         self.segment_2 = []
 
     def trj_cycle(self, all_res=True):
-        """Основной алгоритм программы"""
+        """Main program"""
         if self.s_array is None:
             raise ValueError
         t_array = []
