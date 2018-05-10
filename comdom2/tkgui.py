@@ -168,29 +168,29 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет не закончен!')
+            showerror('Error!', 'The calculation is still running!')
             return
         try:
             r_min, r_max, r_mean, t_min, t_max, std, perc_25, median, perc_75 = self.app.stat()
         except NameError:
-            showerror('Информация', 'Данные недоступны')
+            showerror('Error!', 'Data unavailable')
             return
         except ValueError:
-            showinfo('Информация', 'Статистика недоступна')
+            showerror('Error', 'Statistics unavailable')
             return
-        showinfo('Статистика', 'Минимальное расстояние между доменами равно: {0:.3f} \u212b (t= {1:.2f} пc)\n'
-                               'Максимальное расстояние между доменами равно: {2:.3f} \u212b (t= {3:.2f} пc)\n'
-                               'Среднее расстояние между доменами равно: {4:.3f} \u212b\n'
-                               'Стандартное отклонение: {5:.3f} \u212b\n'
-                               'Квартили: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
+        showinfo('Statistics', 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} пc)\n'
+                               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} пc)\n'
+                               'The average distance between domains = {4:.3f} \u212b\n'
+                               'The standard deviation = {5:.3f} \u212b\n'
+                               'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
                                '(75%) = {8:.3f} \u212b'.format(
             r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
         self.tx.configure(state='normal')
-        self.tx.insert(tk.END, 'Минимальное расстояние между доменами равно: {0:.3f} \u212b (t= {1:.2f} пc)\n'
-                               'Максимальное расстояние между доменами равно: {2:.3f} \u212b (t= {3:.2f} пc)\n'
-                               'Среднее расстояние между доменами равно: {4:.3f} \u212b\n'
-                               'Стандартное отклонение: {5:.3f} \u212b\n'
-                               'Квартили: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
+        self.tx.insert(tk.END, 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} пc)\n'
+                               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} пc)\n'
+                               'The average distance between domains= {4:.3f} \u212b\n'
+                               'The standard deviation= {5:.3f} \u212b\n'
+                               'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
                                '(75%) = {8:.3f} \u212b'.format(
             r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
         self.tx.configure(state='disabled')
@@ -201,28 +201,28 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет не закончен!')
+            showerror('Error!', 'The calculation is still running!')
             return
-        n_cluster = askinteger('Число кластеров', 'Введите число кластеров (0-автоопределение, алгоритм MeanShift)')
+        n_cluster = askinteger('Number of clusters', 'Enter the number of clusters (0-auto, MeanShift)')
         while n_cluster is None:
-            n_cluster = askinteger('Число кластеров', 'Введите число кластеров (0-автоопределение, алгоритм MeanShift)')
+            n_cluster = askinteger('Number of clusters', 'Enter the number of clusters (0-auto, MeanShift)')
         try:
             xhist, yhist, si_score, std_dev = self.app.cluster(n_cluster)
         except ImportError:
-            showerror('Ошибка!', 'Библиотека scikit-learn не установлена!')
+            showerror('Error!', 'Scikit-learn is not installed!')
             return
         except (NameError, ValueError):
-            showinfo('Информация', 'Данные недоступны')
+            showerror('Error!', 'Data unavailable')
             return
         fig = Figure()
         ax = fig.add_subplot(111)
-        ax.set_title('Cluster analysis')
+        ax.set_title('Clustering')
         ax.set_ylabel(r'$\% \ \tau$')
         ax.set_xlabel(r'$\xi,\ \AA$')
         ax.grid(self.grid)
         ax.bar(xhist.flatten(), yhist, width=[3 * x for x in std_dev], align='center')
         win_cls = tk.Toplevel(self)
-        win_cls.title("Кластерный анализ {:s}".format('MeanShift' if n_cluster == 0 else 'KMeans'))
+        win_cls.title("Clustering {:s}".format('MeanShift' if n_cluster == 0 else 'KMeans'))
         win_cls.minsize(width=640, height=600)
         win_cls.resizable(False, False)
         fra4 = ttk.Frame(win_cls)
@@ -241,16 +241,17 @@ class TkGui(tk.Tk):
         tx.pack(side=tk.LEFT)
         scr.pack(side=tk.RIGHT, fill=tk.Y)
         tx.configure(state='normal')
-        tx.insert(tk.END, 'Количество кластеров равно {0:d}\nSilhouette Coefficient = {1:.2f}\n'
+        tx.insert(tk.END, 'The number of clusters = {0:d}\nSilhouette Coefficient = {1:.2f}\n'
                           '(The best value is 1 and the worst value is -1.\n'
                           'Values near 0 indicate overlapping clusters.\n'
                           'Negative values generally indicate that a sample has been assigned\n'
                           'to the wrong cluster, as a different cluster is more similar.'
-                          ')\nКластеры:'.format(len(xhist), si_score))
+                          ')\nClusters:'.format(len(xhist), si_score))
         for n, cls_center in enumerate(xhist.flatten()):
             tx.insert(tk.END,
-                      '\nКластер № {0:d}: точек траектории {1:.1f} %, положение центроида - {2:.3f} \u212b, '
-                      'СКО = {3:.3f} \u212b'.format(n + 1, yhist[n], cls_center, std_dev[n]))
+                      '\nCluster No {0:d}: points of the trajectory {1:.1f} %,'
+                      ' position of the centroid - {2:.3f} \u212b, '
+                      'RMS = {3:.3f} \u212b'.format(n + 1, yhist[n], cls_center, std_dev[n]))
         self.tx.configure(state='disabled')
 
     def save_data(self):
@@ -259,22 +260,22 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет не закончен!')
+            showerror('Error!', 'The calculation is still running!')
             return
         opt = {'parent': self, 'filetypes': [('DAT', '.dat'), ('Microsoft Excel 97-2003 (xls)', '.xls'),
                                              ('Microsoft Excel 2007+ (xslx)', '.xslx')],
-               'initialfile': 'summary_distances.dat', 'title': 'Сохранить как...'}
+               'initialfile': 'summary_distances.dat', 'title': 'Save as...'}
         sa = asksaveasfilename(**opt)
         try:
             self.app.save(sa)
         except OSError:
-            showerror('Ошибка!', 'Не удалось сохранить {0:s}'.format(sa))
+            showerror('Error!', 'Failed to save {0:s}'.format(sa))
             return
         except (NameError, ValueError):
-            showinfo('Информация', 'Данные недоступны')
+            showerror('Error!', 'Data unavailable')
             return
         except XLSWImportError:
-            showerror('Ошибка!', 'xlsxwriter не установлен! Сохранение в Microsoft Excel 2007+ невозможно!')
+            showerror('Error!', 'xlsxwriter is not installed! Сохранение в Microsoft Excel 2007+ невозможно!')
             return
         except XLWTImportError:
             showerror('Ошибка!', 'xlwt не установлен! Сохранение в Microsoft Excel 97-2003 невозможно!')

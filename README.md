@@ -1,6 +1,6 @@
 # COMDOM2 
 
-## Расчет расстояния между центрами масс доменов по траектории МД
+## The calculation of the distance between the centers of mass of domains in the MD trajectory
 
-Зависимости: periodictable, numpy, matplotlib, progressbar, scikit-learn
+Dependencies: periodictable, numpy, matplotlib, progressbar, scikit-learn
 

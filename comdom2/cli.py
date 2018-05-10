@@ -95,19 +95,12 @@ class Cli:
         try:
             for t, c_mass_1, c_mass_2, r, n in self.app.trj_cycle(not hydr):
                 if t is not None:
-                    print('При t = {0:.3f} {1:s}\n'.format(t if t < 1000 else t / 1000, "пс" if t < 1000 else "нс"))
-                print(
-                    'Coordinates of the center of mass of the first domain: C1 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)'.format(
-                        c_mass_1[0],
-                        c_mass_1[1],
-                        c_mass_1[2]) +
-                    '\n' +
-                    'the second domain: C2 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)'.format(
-                        c_mass_2[0],
-                        c_mass_2[1],
-                        c_mass_2[2]) +
-                    '\n' +
-                    'the distance between domains: {0:.3f} \u212b'.format(r))
+                    print('При t = {0:.3f} {1:s}\n'.format(t if t < 1000 else t / 1000, "ps" if t < 1000 else "ns"))
+                print('Coordinates of the center of mass of the first domain: '
+                      'C1 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)\n'
+                      'the second domain: C2 ({3:.3f} \u212b, {4:.3f} \u212b, {5:.3f} \u212b)\n'
+                      'the distance between domains: {6:.3f} \u212b'.format(c_mass_1[0], c_mass_1[1], c_mass_1[2],
+                                                                            c_mass_2[0], c_mass_2[1], c_mass_2[2], r))
                 bar1.update(n)
         except NoDataFor1stDom:
             print('Error! Data for the first domain are not collected.')
@@ -134,7 +127,7 @@ class Cli:
               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} пc)\n'
               'The average distance between domains= {4:.3f} \u212b\nStandard deviation: {5:.3f} \u212b\n'
               'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, (75%) = {8:.3f} \u212b'.format(
-            r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
+               r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
 
     def cluster_an(self):
         """
@@ -163,8 +156,9 @@ class Cli:
               'Negative values generally indicate that a sample has been assigned\n'
               'to the wrong cluster, as a different cluster is more similar.)\nКластеры:'.format(len(xhist), si_score))
         for n, cls_center in enumerate(xhist.flatten()):
-            print('Cluster No {0:d}: points of the trajectory {1:.1f} %, the position of the centroid - {2:.3f} \u212b, '
-                  'RMS = {3:.3f} \u212b'.format(n + 1, yhist[n], cls_center, std_dev[n]))
+            print('Cluster No {0:d}: points of the trajectory {1:.1f} %, '
+                  'the position of the centroid - {2:.3f} \u212b, RMS = {3:.3f} \u212b'.format(
+                   n + 1, yhist[n], cls_center, std_dev[n]))
         if self.namespace.ocluster:
             self.save_graph(fig, self.namespace.ocluster)
 
@@ -183,7 +177,7 @@ class Cli:
         if len(ysg) == len(x):
             ax.plot(x, ysg, 'r', label='Filtered COM distance')
         else:
-            print('Не возможно выполнить сглаживание!')
+            print('It is not possible to perform smoothing!')
         ax.grid(True)
         ax.legend(loc='best', frameon=False)
         if self.namespace.ofigure:
@@ -198,16 +192,16 @@ class Cli:
         try:
             self.app.save(sa)
         except OSError:
-            print('Не удалось сохранить {0:s}!'.format(sa))
+            print('Failed to save {0:s}!'.format(sa))
         except (NameError, ValueError):
-            print('Данные недоступны!')
+            print('Data unavailable!')
         except XLSWImportError:
-            print('xlsxwriter не установлен! Сохранение в Microsoft Excel 2007+ невозможно!')
+            print('xlsxwriter is not installed! Saving in Microsoft Excel 2007+ impossible!')
             return
         except XLWTImportError:
-            print('xlwt не установлен! Сохранение в Microsoft Excel 97-2003 невозможно!')
+            print('xlwt is not installed! Saving in Microsoft Excel 97-2003impossible!')
         except BadExtError:
-            print('Неподдерживаемый формат файла! Поддреживаемые форматы: dat, xsl, xslx')
+            print('Unsupported file format! Supported formats: dat, xsl, xslx')
 
     @staticmethod
     def save_graph(fig, sa):
@@ -218,13 +212,13 @@ class Cli:
         :return:
         """
         if fig is None:
-            print('График недоступен!\n')
+            print('Graph unavailable!\n')
             return
         if sa:
             try:
                 plt.savefig(sa, dpi=600)
             except AttributeError:
-                print('График недоступен!')
+                print('Graph unavailable!')
             except ValueError:
-                print('Неподдерживаемый формат файла рисунка!\n'
-                      'Поддреживаемые форматы: eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff.\n')
+                print('Unsupported file format of the picture!\n'
+                      'Supported formats: eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff.\n')
