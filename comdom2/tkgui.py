@@ -43,35 +43,35 @@ class TkGui(tk.Tk):
         but12.grid(row=0, column=1, padx=10)
         fra11 = ttk.Frame(fra1)
         fra11.grid(row=1, column=0, pady=10, padx=10)
-        self.tx1 = tk.Text(fra11, width=40, height=5)
+        self.tx1 = tk.Text(fra11, width=30, height=5)
         scr1 = ttk.Scrollbar(fra11, command=self.tx1.yview)
         self.tx1.configure(yscrollcommand=scr1.set, state='disabled')
         self.tx1.pack(side=tk.LEFT)
         self.tx1.bind('<Enter>', lambda e: self._bound_to_mousewheel(e, self.tx1))
         self.tx1.bind('<Leave>', self._unbound_to_mousewheel)
         scr1.pack(side=tk.RIGHT, fill=tk.Y)
-        lab2 = ttk.LabelFrame(fra1, text='Второй домен', labelanchor='n', borderwidth=5)
+        lab2 = ttk.LabelFrame(fra1, text='The second domain', labelanchor='n', borderwidth=5)
         lab2.grid(row=2, column=0, pady=5, padx=5)
-        but2 = ttk.Button(lab2, text='Добавить диапазон а.о.', command=self.seg2)
+        but2 = ttk.Button(lab2, text='Add a range', command=self.seg2)
         but2.grid(row=0, column=0, padx=10)
-        but22 = ttk.Button(lab2, text='Сброс', command=self.sbros_2)
+        but22 = ttk.Button(lab2, text='Reset', command=self.sbros_2)
         but22.grid(row=0, column=1, padx=10)
         fra12 = ttk.Frame(fra1)
         fra12.grid(row=3, column=0, pady=10, padx=10)
-        self.tx2 = tk.Text(fra12, width=40, height=5)
+        self.tx2 = tk.Text(fra12, width=30, height=5)
         scr2 = ttk.Scrollbar(fra12, command=self.tx2.yview)
         self.tx2.configure(yscrollcommand=scr2.set, state='disabled')
         self.tx2.pack(side=tk.LEFT)
         self.tx2.bind('<Enter>', lambda e: self._bound_to_mousewheel(e, self.tx2))
         self.tx2.bind('<Leave>', self._unbound_to_mousewheel)
         scr2.pack(side=tk.RIGHT, fill=tk.Y)
-        lab3 = ttk.Label(fra1, text='Прогресс:')
+        lab3 = ttk.Label(fra1, text='Progress:')
         lab3.grid(row=4, column=0, columnspan=4, pady=5)
         s = ttk.Style()
         s.configure('My.TButton', font=('Helvetica', 10), foreground='red')
-        but3 = ttk.Button(fra1, text='Остановить!', style='My.TButton', command=self.stop)
+        but3 = ttk.Button(fra1, text='Stop!', style='My.TButton', command=self.stop)
         but3.grid(row=6, column=0, columnspan=2, pady=10)
-        self.pb = ttk.Progressbar(fra1, orient='horizontal', mode='determinate', length=290)
+        self.pb = ttk.Progressbar(fra1, orient='horizontal', mode='determinate', length=240)
         self.pb.grid(row=5, column=0, columnspan=2)
         self.fra2 = ttk.Frame(self, width=660, height=515)
         self.fra2.grid(row=0, column=1)
@@ -126,39 +126,40 @@ class TkGui(tk.Tk):
         """
 
         """
-        showinfo('Информация', 'Построение зависимости расстояния\nмежду центрами масс доменов белка от времени МД')
+        showinfo('About',
+                 'The dependence of the distance between the centers of mass of protein domains on the time of MD')
 
     def menu(self):
-        """Метод инициалиции меню"""
-        m = tk.Menu(self)  # создается объект Меню на главном окне
-        self.config(menu=m)  # окно конфигурируется с указанием меню для него
-        fm = tk.Menu(m)  # создается пункт меню с размещением на основном меню (m)
-        # пункту располагается на основном меню (m)
-        m.add_cascade(label='Файл', menu=fm)
-        # формируется список команд пункта меню
-        fm.add_command(label='Открыть PDB', command=self.open_pdb)
-        fm.add_command(label='Сохранить график', command=self.save_graph)
-        fm.add_command(label='Сохранить как...', command=self.save_data)
-        fm.add_command(label='Сохранить LOG', command=self.save_log)
-        fm.add_command(label='Выход', command=self.close_win)
-        rm = tk.Menu(m)  # создается пункт меню с размещением на основном меню (m)
-        # пункту располагается на основном меню (m)
-        m.add_cascade(label='Запуск', menu=rm)
-        rm.add_command(label='Все а.о.', command=self.run)
-        rm.add_command(label='Гидрофобные а.о.', command=self.trj_cycle_hf)
-        om = tk.Menu(m)  # создается пункт меню с размещением на основном меню (m)
-        # пункту располагается на основном меню (m)
-        m.add_cascade(label='Опции', menu=om)
-        om.add_command(label='Сетка графика', command=self.grid_set)
-        om.add_command(label='Легенда', command=self.legend_set)
-        om.add_command(label='Сглаживание', command=self.smoth_set)
-        om.add_command(label='Статистика', command=self.xvg_stat)
-        om.add_command(label='Кластерный анализ', command=self.cluster_an)
-        m.add_command(label='Справка', command=self.about)
+        """Method of initialize menu"""
+        m = tk.Menu(self)  # creates a Menu object for main window
+        self.config(menu=m)  # the window is configured with the menu for it
+        fm = tk.Menu(m)  # creates a menu item with the placement on the main menu (m)
+        # item is located on the main menu (m)
+        m.add_cascade(label='File', menu=fm)
+        # a list of commands of a menu item
+        fm.add_command(label='Open PDB', command=self.open_pdb)
+        fm.add_command(label='Save graph', command=self.save_graph)
+        fm.add_command(label='Save as...', command=self.save_data)
+        fm.add_command(label='Save LOG', command=self.save_log)
+        fm.add_command(label='Quit', command=self.close_win)
+        rm = tk.Menu(m)  # creates a menu item with the placement on the main menu (m)
+        # item is located on the main menu (m)
+        m.add_cascade(label='Run', menu=rm)
+        rm.add_command(label='All residues', command=self.run)
+        rm.add_command(label='Only hydrophobic residues', command=self.trj_cycle_hf)
+        om = tk.Menu(m)  # creates a menu item with the placement on the main menu (m)
+        # item is located on the main menu (m)
+        m.add_cascade(label='Options', menu=om)
+        om.add_command(label='Graph grid', command=self.grid_set)
+        om.add_command(label='Legend', command=self.legend_set)
+        om.add_command(label='Smoothing', command=self.smoth_set)
+        om.add_command(label='Statistics', command=self.xvg_stat)
+        om.add_command(label='Clustering', command=self.cluster_an)
+        m.add_command(label='About', command=self.about)
 
     def close_win(self):
-        """Самоуничтожение с вопросом"""
-        if askyesno('Выход', 'Вы точно хотите выйти?'):
+        """Self-destruct with a question"""
+        if askyesno('Quit', 'Are your sure?'):
             self.destroy()
 
     def xvg_stat(self):
