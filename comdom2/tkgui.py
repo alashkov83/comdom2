@@ -29,7 +29,7 @@ class TkGui(tk.Tk):
 
     def __init__(self, namespace):
         super().__init__()
-        self.title('Comdom')
+        self.title('ComDom 2')
         self.resizable(False, False)
         self.protocol('WM_DELETE_WINDOW', self.close_win)
         self.menu()
@@ -138,7 +138,7 @@ class TkGui(tk.Tk):
         m.add_cascade(label='File', menu=fm)
         # a list of commands of a menu item
         fm.add_command(label='Open PDB', command=self.open_pdb)
-        fm.add_command(label='Save graph', command=self.save_graph)
+        fm.add_command(label='Save plot', command=self.save_graph)
         fm.add_command(label='Save as...', command=self.save_data)
         fm.add_command(label='Save LOG', command=self.save_log)
         fm.add_command(label='Quit', command=self.close_win)
@@ -150,8 +150,8 @@ class TkGui(tk.Tk):
         om = tk.Menu(m)  # creates a menu item with the placement on the main menu (m)
         # item is located on the main menu (m)
         m.add_cascade(label='Options', menu=om)
-        om.add_command(label='Graph grid', command=self.grid_set)
-        om.add_command(label='Legend', command=self.legend_set)
+        om.add_command(label='Plot grid', command=self.grid_set)
+        om.add_command(label='Plot legend', command=self.legend_set)
         om.add_command(label='Smoothing', command=self.smoth_set)
         om.add_command(label='Statistics', command=self.xvg_stat)
         om.add_command(label='Clustering', command=self.cluster_an)
@@ -275,20 +275,20 @@ class TkGui(tk.Tk):
             showerror('Error!', 'Data unavailable')
             return
         except XLSWImportError:
-            showerror('Error!', 'xlsxwriter is not installed! Сохранение в Microsoft Excel 2007+ невозможно!')
+            showerror('Error!', 'xlsxwriter is not installed! Saving in Microsoft Excel 2007+ impossible!')
             return
         except XLWTImportError:
-            showerror('Ошибка!', 'xlwt не установлен! Сохранение в Microsoft Excel 97-2003 невозможно!')
+            showerror('Error!', 'xlwt is not installed! Saving in Microsoft Excel 97-2003 impossible!')
             return
         except BadExtError:
-            showerror('Ошибка!', 'Неподдерживаемый форат файла!')
+            showerror('Error!', 'Unsupported file format!')
             return
 
     def save_log(self):
         """
 
         """
-        opt = {'parent': self, 'filetypes': [('LOG', '.log'), ], 'initialfile': 'myfile.log', 'title': 'Сохранить LOG'}
+        opt = {'parent': self, 'filetypes': [('LOG', '.log'), ], 'initialfile': 'myfile.log', 'title': 'Save LOG'}
         sa = asksaveasfilename(**opt)
         if sa:
             letter = self.tx.get(1.0, tk.END)
@@ -304,15 +304,14 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет не закончен!')
+            showerror('Error!', 'The calculation is still running!')
             return
         if self.fig is None:
-            showerror('Ошибка!', 'График недоступен!')
+            showerror('Error!', 'Plot unavailable!')
             return
-        opt = {'parent': self, 'filetypes': [('Все поддерживаесые форматы', (
-            '.eps', '.jpeg', '.jpg', '.pdf', '.pgf', '.png', '.ps', '.raw', '.rgba', '.svg', '.svgz', '.tif',
-            '.tiff')), ],
-               'initialfile': 'myfile.png', 'title': 'Сохранить график'}
+        opt = {'parent': self, 'filetypes': [('All supported formats', (
+               '.eps', '.jpeg', '.jpg', '.pdf', '.pgf', '.png', '.ps', '.raw', '.rgba', '.svg', '.svgz', '.tif',
+               '.tiff')), ], 'initialfile': 'myfile.png', 'title': 'Save plot'}
         sa = asksaveasfilename(**opt)
         if sa:
             try:
@@ -320,17 +319,17 @@ class TkGui(tk.Tk):
             except FileNotFoundError:
                 return
             except AttributeError:
-                showerror('Ошибка!', 'График недоступен!')
+                showerror('Error!', 'Plot unavailable!')
             except ValueError:
-                showerror('Неподдерживаемый формат файла рисунка!',
-                          'Поддреживаемые форматы: eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff.')
+                showerror('Unsupported file format of the picture!',
+                          'Supported formats: eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff.')
 
     def grid_set(self):
         """
 
         :return:
         """
-        self.grid = bool(askyesno('Cетка', 'Отобразить?'))
+        self.grid = bool(askyesno('Plot grid', 'Display?'))
         if self.run_flag:
             return
         try:
@@ -348,7 +347,7 @@ class TkGui(tk.Tk):
 
         :return:
         """
-        self.legend = bool(askyesno('Техническая легенда', 'Отобразить?'))
+        self.legend = bool(askyesno('Plot legend', 'Display?'))
         if self.run_flag:
             return
         try:
@@ -366,7 +365,7 @@ class TkGui(tk.Tk):
 
         :return:
         """
-        self.smoth = bool(askyesno('Сглаживание по Савицкому-Голаю', 'Отобразить?'))
+        self.smoth = bool(askyesno('Smoothing according to Savitsky-Golay', 'Display?'))
         if self.app.nparray is None:
             return
         if self.run_flag:
@@ -382,7 +381,6 @@ class TkGui(tk.Tk):
             pass
 
     def _graph(self):
-        """Графулька без эксэльки"""
         self.fig = None
         self.fig = Figure()
         ax = self.fig.add_subplot(111)
@@ -399,7 +397,7 @@ class TkGui(tk.Tk):
             if len(ysg) == len(x):
                 ax.plot(x, ysg, 'r', label='Filtered COM distance')
             else:
-                showerror('Ошибка!', 'Не возможно выполнить сглаживание!')
+                showerror('Error!', 'It is not possible to perform smoothing!')
                 self.smoth = False
         ax.grid(self.grid)
         if self.legend:
@@ -418,12 +416,12 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag and not self.stop_flag:
-            showerror('Ошибка!', 'Расчет уже идёт!')
+            showerror('Error!', 'The calculation is still running!')
             return
         if input_pdb:
             pdb = input_pdb
         else:
-            opt = {'filetypes': [('Файлы PDB', ('.pdb', '.PDB', '.ent')), ('Все файлы', '.*')]}
+            opt = {'filetypes': [('PDB', ('.pdb', '.PDB', '.ent')), ('All files', '.*')]}
             pdb = askopenfilename(**opt)
         if pdb:
             try:
@@ -431,7 +429,7 @@ class TkGui(tk.Tk):
             except FileNotFoundError:
                 return
             else:
-                showinfo('Информация', 'Файл прочитан!')
+                showinfo('Info', 'File was read!')
         else:
             return
         try:
@@ -453,7 +451,7 @@ class TkGui(tk.Tk):
         self.tx.configure(state='disabled')
 
     def stop(self):
-        """Стоять я сказал!"""
+        """Stop I said!"""
         if self.stop_flag:
             self.run()
         else:
@@ -461,47 +459,45 @@ class TkGui(tk.Tk):
             self.stop_flag = True
 
     def seg1(self):
-        """Задание а.о. первого домена"""
+        """Set residues in the first domain"""
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет уже идёт!')
+            showerror('Error!', 'The calculation is still running!')
             return
-        chain_name_1 = askstring('Первый домен', 'Имя цепи: ')
+        chain_name_1 = askstring('The first domain', 'Chain name: ')
         if chain_name_1 == '' or chain_name_1 is None:
             chain_name_1 = ' '
-        r_num_start_1 = askinteger('Первый домен', 'Номер первого а.о.: ')
-        r_num_end_1 = askinteger('Первый домен', 'Номер последнего а.о.: ')
+        r_num_start_1 = askinteger('The first domain', 'The number of the first residue: ')
+        r_num_end_1 = askinteger('The first domain', 'The number of the last residue:: ')
         if (r_num_start_1 is None) or (r_num_end_1 is None):
             return
         if r_num_start_1 > r_num_end_1:
-            showerror('Ошибка!', 'Номер первого а.о. должен быть не больше последнего!')
+            showerror('Error!', 'The number of the first residue should be no more than the last! ')
             return
         self.tx1.configure(state='normal')
-        self.tx1.insert(tk.END,
-                        'Цепь {0:s}, а.о. с {1:>4d} по {2:>4d}\n'.format(
-                            chain_name_1, r_num_start_1, r_num_end_1))
+        self.tx1.insert(tk.END, 'Chain {0:s}, residues with {1:>4d} to {2:>4d}\n'.format(chain_name_1, r_num_start_1,
+                                                                                         r_num_end_1))
         self.tx1.configure(state='disabled')
         for s_1 in range(r_num_start_1, r_num_end_1 + 1):
             self.app.segment_1.append((chain_name_1, s_1))
 
     def seg2(self):
-        """Задание а.о. второго домена"""
+        """Set residues in the second domain"""
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет уже идёт!')
+            showerror('Error!', 'The calculation is still running!')
             return
-        chain_name_2 = askstring('Второй домен', 'Имя цепи: ')
+        chain_name_2 = askstring('The second domain', 'Chain name: ')
         if chain_name_2 == '' or chain_name_2 is None:
             chain_name_2 = ' '
-        r_num_start_2 = askinteger('Второй домен', 'Номер первого а.о.: ')
-        r_num_end_2 = askinteger('Второй домен', 'Номер последнего а.о.: ')
+        r_num_start_2 = askinteger('The second domain', 'The number of the first residue: ')
+        r_num_end_2 = askinteger('The second domain', 'The number of the last residue: ')
         if (r_num_start_2 is None) or (r_num_end_2 is None):
             return
         if r_num_start_2 > r_num_end_2:
-            showerror('Ошибка!', 'Номер первого а.о. должен быть не больше последнего!')
+            showerror('Error!', 'The number of the first residue should be no more than the last! ')
             return
         self.tx2.configure(state='normal')
-        self.tx2.insert(tk.END,
-                        'Цепь {0:s}, а.о. с {1:>4d} по {2:>4d}\n'.format(
-                            chain_name_2, r_num_start_2, r_num_end_2))
+        self.tx2.insert(tk.END, 'Chain {0:s}, residues with {1:>4d} to {2:>4d}\n'.format(chain_name_2, r_num_start_2,
+                                                                                         r_num_end_2))
         self.tx2.configure(state='disabled')
         for s_2 in range(r_num_start_2, r_num_end_2 + 1):
             self.app.segment_2.append((chain_name_2, s_2))
@@ -512,7 +508,7 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет уже идёт!')
+            showerror('Error!', 'The calculation is still running!')
             return
         self.app.segment_1.clear()
         self.tx1.configure(state='normal')
@@ -525,7 +521,7 @@ class TkGui(tk.Tk):
         :return:
         """
         if self.run_flag:
-            showerror('Ошибка!', 'Расчет уже идёт!')
+            showerror('Error!', 'The calculation is still running!')
             return
         self.app.segment_2.clear()
         self.tx2.configure(state='normal')
@@ -537,16 +533,16 @@ class TkGui(tk.Tk):
 
         """
         self.all_res = False
-        showinfo('Внимание!', 'Нестандартные аминокислоты и лиганды принимаются за гидрофобные!')
+        showinfo('Attention!', 'Non-standard amino acids and ligands\nwill be accepted as hydrophobic!')
         self.run()
 
     def run(self):
-        """Основной алгоритм программы"""
+        """The main algorithm of the program"""
         if self.run_flag and not self.stop_flag:
-            showerror('Ошибка!', 'Расчет уже идёт!')
+            showerror('Error!', 'The calculation is still running!')
             return
         if self.app.s_array is None:
-            showerror('Ошибка!', 'Не загружен файл!')
+            showerror('Error!', 'File was not download!')
             return
         self.run_flag = True
         try:
@@ -565,21 +561,13 @@ class TkGui(tk.Tk):
             for t, c_mass_1, c_mass_2, r, n in self.app.trj_cycle(self.all_res):
                 self.tx.configure(state='normal')
                 if t is not None:
-                    self.tx.insert(tk.END, 'При t = {0:.3f} {1:s}\n'.format(
-                        t if t < 1000 else t / 1000, "пс" if t < 1000 else "нс"))
-                self.tx.insert(tk.END,
-                               'Координаты центра масс первого домена: '
-                               'C1 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)'.format(
-                                   c_mass_1[0],
-                                   c_mass_1[1],
-                                   c_mass_1[2]) +
-                               '\n' +
-                               'второго домена: C2 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)'.format(
-                                   c_mass_2[0],
-                                   c_mass_2[1],
-                                   c_mass_2[2]) +
-                               '\n' +
-                               'расстояние между доменами: {0:.3f} \u212b\n'.format(r))
+                    self.tx.insert(tk.END, 'At t = {0:.3f} {1:s}\n'.format(
+                        t if t < 1000 else t / 1000, "ps" if t < 1000 else "ns"))
+                self.tx.insert(tk.END, 'Coordinates of the center of mass of the first domain:'
+                               'C1 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)\n'
+                               'the second domain: C2({3: .3f} \u212b, {4: .3f} \u212b, {5: .3f} \u212b\n'
+                               'the distance between domains: {6:.3f} \u212b\n').format(
+                               c_mass_1[0], c_mass_1[1], c_mass_1[2], c_mass_2[0], c_mass_2[1], c_mass_2[2], r)
                 self.tx.configure(state='disabled')
                 self.pb['value'] = n
                 self.pb.update()
@@ -587,22 +575,22 @@ class TkGui(tk.Tk):
                     self.run_flag = False
                     break
         except NoDataFor1stDom:
-            showerror('Ошибка!', 'Данные для первого домена не собраны!')
-            showinfo('Внимание', 'Диапазоны а.о. доменов не обнулены!')
+            showerror('Error!', 'Data for the first domain was not collected!')
+            showinfo('Attention!', 'Residues ranges was not cleaned!')
             self.pb['value'] = 0
             self.pb.update()
             self.run_flag = False
             return
         except NoDataFor2ndDom:
-            showerror('Ошибка!', 'Данные для второго домена не собраны!')
-            showinfo('Внимание', 'Диапазоны а.о. доменов не обнулены!')
+            showerror('Error!', 'Data for the second domain was not collected!')
+            showinfo('Attention!', 'Residues ranges was not cleaned!')
             self.pb['value'] = 0
             self.pb.update()
             self.run_flag = False
             return
         except DataNotObserved:
-            showerror('Ощибка!', 'Данные не собраны!')
-            showinfo('Внимание', 'Диапазоны а.о. доменов не обнулены!')
+            showerror('Error!', 'Data was not collected!')
+            showinfo('Attention!', 'Residues ranges was not cleaned!')
             self.pb['value'] = 0
             self.pb.update()
             self.run_flag = False
@@ -616,4 +604,4 @@ class TkGui(tk.Tk):
                     pass
                 self._graph()
         self.all_res = True
-        showinfo('Внимание', 'Диапазоны а.о. доменов не обнулены!')
+        showinfo('Attention!', 'Residues ranges was not cleaned!')

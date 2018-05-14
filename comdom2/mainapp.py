@@ -135,7 +135,7 @@ class App:
     @staticmethod
     @lru_cache()
     def _mass(element: str) -> float:
-        """Масса атома. Использование словаря для часто встречающихся в биоорганике типов атомов ускоряет расчёты."""
+        """The mass of the atom. Use a dictionary for frequently types of atoms accelerates calculations."""
         elements = {
             ' H': 1.0,
             ' C': 12.0,

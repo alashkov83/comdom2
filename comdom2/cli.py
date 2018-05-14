@@ -95,7 +95,7 @@ class Cli:
         try:
             for t, c_mass_1, c_mass_2, r, n in self.app.trj_cycle(not hydr):
                 if t is not None:
-                    print('При t = {0:.3f} {1:s}\n'.format(t if t < 1000 else t / 1000, "ps" if t < 1000 else "ns"))
+                    print('At t = {0:.3f} {1:s}\n'.format(t if t < 1000 else t / 1000, "ps" if t < 1000 else "ns"))
                 print('Coordinates of the center of mass of the first domain: '
                       'C1 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)\n'
                       'the second domain: C2 ({3:.3f} \u212b, {4:.3f} \u212b, {5:.3f} \u212b)\n'
@@ -212,7 +212,7 @@ class Cli:
         :return:
         """
         if fig is None:
-            print('Graph unavailable!\n')
+            print('Plot unavailable!\n')
             return
         if sa:
             try:
