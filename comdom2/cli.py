@@ -126,7 +126,7 @@ class Cli:
               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} ps)\n'
               'The average distance between domains= {4:.3f} \u212b\nStandard deviation: {5:.3f} \u212b\n'
               'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, (75%) = {8:.3f} \u212b'.format(
-            r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
+               r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
 
     def cluster_an(self):
         """
@@ -159,11 +159,14 @@ class Cli:
         for n, cls_center in enumerate(xhist.flatten()):
             print('Cluster No {0:d}: points of the trajectory {1:.1f} %, '
                   'the position of the centroid - {2:.3f} \u212b, RMS = {3:.3f} \u212b'.format(
-                n + 1, yhist[n], cls_center, std_dev[n]))
+                   n + 1, yhist[n], cls_center, std_dev[n]))
         if self.namespace.ocluster:
             self.save_graph(fig, self.namespace.ocluster)
 
     def graph(self):
+        """
+
+        """
         try:
             fig = self.app.getgraphdata()
         except SmothPlotError:
@@ -190,7 +193,6 @@ class Cli:
             return
         except XLWTImportError:
             print('xlwt is not installed! Saving in Microsoft Excel 97-2003impossible!')
-
 
     @staticmethod
     def save_graph(fig, sa):

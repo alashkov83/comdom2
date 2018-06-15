@@ -9,11 +9,17 @@ import argparse
 
 
 class Parser(argparse.ArgumentParser):
+    """
+
+    """
     def __init__(self):
         super().__init__()
         self.parser_setup()
 
     def parser_setup(self):
+        """
+
+        """
         self.add_argument('-i', '--input', type=str, default='', help='Input file name (pdb)')
         self.add_argument('-s1', '--segment1', type=str, help='Ranges of residues in domain No 1')
         self.add_argument('-s2', '--segment2', type=str, help='Ranges of residues in domain No 2')
@@ -23,10 +29,12 @@ class Parser(argparse.ArgumentParser):
         self.add_argument('-n', '--n_cluster', type=int, default=0,
                           help='Number of clusters for clustering. 0 (default) for MeanShift algorithm')
         self.add_argument('-o', '--output', type=str, default='', help='Output file name (dat, xsl, xslx)')
-        self.add_argument('-oc', '--ocluster', type=str, default='', help='Output file name for clustering histogram'
-                          ' (eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff)')
-        self.add_argument('-of', '--ofigure', type=str, default='', help='Output file name for graphic'
-                          ' (eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff)')
+        self.add_argument('-oc', '--ocluster', type=str, default='',
+                          help='Output file name for clustering histogram (eps, jpeg, jpg, pdf, pgf, png, ps, raw, '
+                               'rgba, svg, svgz, tif, tiff)')
+        self.add_argument('-of', '--ofigure', type=str, default='',
+                          help='Output file name for graphic (eps, jpeg, jpg, pdf, pgf, png, ps, raw, '
+                               'rgba, svg, svgz, tif, tiff)')
 
 
 if __name__ == '__main__':

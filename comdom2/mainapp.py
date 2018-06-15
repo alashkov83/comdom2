@@ -168,9 +168,10 @@ class App:
         perc_75 = np.percentile(r, 75)
         return r_min, r_max, r_mean, t_min, t_max, std, perc_25, median, perc_75
 
-    def cluster(self, n_cluster, grid=True):
+    def cluster(self, n_cluster: int, grid: bool=True):
         """
 
+        :param grid:
         :param n_cluster:
         :return:
         """
@@ -185,6 +186,8 @@ class App:
             ap = MeanShift().fit(r.reshape(-1, 1))
         elif n_cluster > 0:
             ap = KMeans(n_cluster).fit(r.reshape(-1, 1))
+        else:
+            raise ValueError
         yhist = []
         for n in range(len(ap.cluster_centers_)):
             yhist.append(100 * len(list(filter(lambda x: x == n, ap.labels_))) / len(ap.labels_))
@@ -257,6 +260,7 @@ class App:
             else:
                 raise BadExtError
 
+    # noinspection PyAugmentAssignment
     def getgraphdata(self, smoth=True, grid=True, legend=True):
         """
 

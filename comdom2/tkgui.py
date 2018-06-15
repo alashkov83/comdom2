@@ -183,7 +183,7 @@ class TkGui(tk.Tk):
                                'The standard deviation = {5:.3f} \u212b\n'
                                'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
                                '(75%) = {8:.3f} \u212b'.format(
-            r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
+                                r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
         self.tx.configure(state='normal')
         self.tx.insert(tk.END, 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} ps)\n'
                                'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} ps)\n'
@@ -191,7 +191,7 @@ class TkGui(tk.Tk):
                                'The standard deviation= {5:.3f} \u212b\n'
                                'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
                                '(75%) = {8:.3f} \u212b'.format(
-            r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
+                                r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
         self.tx.configure(state='disabled')
 
     def cluster_an(self):
@@ -283,7 +283,6 @@ class TkGui(tk.Tk):
         except XLWTImportError:
             showerror('Error!', 'xlwt is not installed! Saving in Microsoft Excel 97-2003 impossible!')
             return
-
 
     def save_log(self):
         """
@@ -382,6 +381,9 @@ class TkGui(tk.Tk):
             pass
 
     def graph(self):
+        """
+
+        """
         self.fig = None
         try:
             self.fig = self.app.getgraphdata(smoth=self.smoth, grid=self.grid, legend=self.legend)
