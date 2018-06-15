@@ -8,13 +8,12 @@
 
 import sys
 from tkinter.messagebox import showinfo
-import matplotlib
-import matplotlib.pyplot as plt
+
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
 from .joke import joke
 from .mainapp import App, XLSWImportError, XLWTImportError, BadExtError, NoDataFor1stDom, NoDataFor2ndDom, \
-    DataNotObserved
-
-matplotlib.use('Agg')
+    DataNotObserved, SmothPlotError
 
 
 class Cli:
@@ -124,10 +123,10 @@ class Cli:
             print('Statistics are not available!')
             return
         print('\nStatistics:\nThe minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} ps)\n'
-              'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} пc)\n'
+              'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} ps)\n'
               'The average distance between domains= {4:.3f} \u212b\nStandard deviation: {5:.3f} \u212b\n'
               'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, (75%) = {8:.3f} \u212b'.format(
-               r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
+            r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
 
     def cluster_an(self):
         """
@@ -136,50 +135,39 @@ class Cli:
         """
         n_cluster = self.namespace.n_cluster
         try:
-            xhist, yhist, si_score, std_dev = self.app.cluster(n_cluster)
+            xhist, yhist, si_score, calinski, std_dev, fig = self.app.cluster(n_cluster)
         except ImportError:
             print('Scikit-learn is not installed!')
             return
         except (NameError, ValueError):
             showinfo('Info', 'Data not available for clustering')
             return
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.set_title('Cluster analysis')
-        ax.set_ylabel(r'$\% \ \tau$')
-        ax.set_xlabel(r'$\xi,\ \AA$')
-        ax.grid(True)
-        ax.bar(xhist.flatten(), yhist, width=[3 * x for x in std_dev], align='center')
-        print('Clustering:\nThe number of clusters: {0:d}\nSilhouette Coefficient = {1:.2f}\n'
-              '(The best value is 1 and the worst value is -1.\n'
+        print('The number of clusters = {0:d}\nSilhouette Coefficient = {1:.2f}\n'
+              '++++++++++++++++++++++++++++++++++++++++++++++\n'
+              'The best value is 1 and the worst value is -1.\n'
               'Values near 0 indicate overlapping clusters.\n'
               'Negative values generally indicate that a sample has been assigned\n'
-              'to the wrong cluster, as a different cluster is more similar.)\nКластеры:'.format(len(xhist), si_score))
+              'to the wrong cluster, as a different cluster is more similar.\n'
+              '++++++++++++++++++++++++++++++++++++++++++++++\n'
+              'Calinski-Harabaz score = {2:.2f}\n'
+              '++++++++++++++++++++++++++++++++++++++++++++++\n'
+              'Calinski-Harabaz score is defined as ratio between\n'
+              'the within-cluster dispersion\n'
+              'and the between-cluster dispersion. (-1 for only one cluster)\n'
+              '++++++++++++++++++++++++++++++++++++++++++++++\n'
+              'Clusters:'.format(len(xhist), si_score, calinski))
         for n, cls_center in enumerate(xhist.flatten()):
             print('Cluster No {0:d}: points of the trajectory {1:.1f} %, '
                   'the position of the centroid - {2:.3f} \u212b, RMS = {3:.3f} \u212b'.format(
-                   n + 1, yhist[n], cls_center, std_dev[n]))
+                n + 1, yhist[n], cls_center, std_dev[n]))
         if self.namespace.ocluster:
             self.save_graph(fig, self.namespace.ocluster)
 
     def graph(self):
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.set_title('COM distance vs. time')
-        ax.set_ylabel(r'$\xi,\ \AA$')
-        x, y, ysg = self.app.getgraphdata()
-        if (max(x) - min(x)) > 10000:
-            ax.set_xlabel(r'$Time,\ ns$')
-            x /= 1000
-        else:
-            ax.set_xlabel(r'$Time,\ ps$')
-        ax.plot(x, y, color='black', label='Raw COM distance')
-        if len(ysg) == len(x):
-            ax.plot(x, ysg, 'r', label='Filtered COM distance')
-        else:
-            print('It is not possible to perform smoothing!')
-        ax.grid(True)
-        ax.legend(loc='best', frameon=False)
+        try:
+            fig = self.app.getgraphdata()
+        except SmothPlotError:
+            fig = self.app.getgraphdata(smoth=False)
         if self.namespace.ofigure:
             self.save_graph(fig, self.namespace.ofigure)
 
@@ -191,6 +179,8 @@ class Cli:
         sa = self.namespace.output
         try:
             self.app.save(sa)
+        except BadExtError:
+            print('Unsupported file format! Supported formats: dat, xsl, xslx')
         except OSError:
             print('Failed to save {0:s}!'.format(sa))
         except (NameError, ValueError):
@@ -200,8 +190,7 @@ class Cli:
             return
         except XLWTImportError:
             print('xlwt is not installed! Saving in Microsoft Excel 97-2003impossible!')
-        except BadExtError:
-            print('Unsupported file format! Supported formats: dat, xsl, xslx')
+
 
     @staticmethod
     def save_graph(fig, sa):
@@ -215,8 +204,9 @@ class Cli:
             print('Plot unavailable!\n')
             return
         if sa:
+            FigureCanvasAgg(fig)
             try:
-                plt.savefig(sa, dpi=600)
+                fig.savefig(sa, dpi=600)
             except AttributeError:
                 print('Graph unavailable!')
             except ValueError:

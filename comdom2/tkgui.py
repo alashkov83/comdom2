@@ -17,11 +17,10 @@ from tkinter.simpledialog import askinteger
 from tkinter.simpledialog import askstring
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-from matplotlib.figure import Figure
 
 from .joke import joke
 from .mainapp import App, XLSWImportError, XLWTImportError, BadExtError, NoDataFor1stDom, NoDataFor2ndDom, \
-    DataNotObserved
+    DataNotObserved, SmothPlotError
 
 
 class TkGui(tk.Tk):
@@ -38,12 +37,12 @@ class TkGui(tk.Tk):
         lab1 = ttk.LabelFrame(fra1, text='The first domain', labelanchor='n', borderwidth=5)
         lab1.grid(row=0, column=0, pady=5, padx=5)
         but1 = ttk.Button(lab1, text='Add a range', command=self.seg1)
-        but1.grid(row=0, column=0, padx=10)
+        but1.grid(row=1, column=0, padx=10, pady=10)
         but12 = ttk.Button(lab1, text='Reset', command=self.sbros_1)
-        but12.grid(row=0, column=1, padx=10)
-        fra11 = ttk.Frame(fra1)
-        fra11.grid(row=1, column=0, pady=10, padx=10)
-        self.tx1 = tk.Text(fra11, width=30, height=5)
+        but12.grid(row=1, column=1, padx=10, pady=10)
+        fra11 = ttk.Frame(lab1)
+        fra11.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
+        self.tx1 = tk.Text(fra11, width=40, height=5)
         scr1 = ttk.Scrollbar(fra11, command=self.tx1.yview)
         self.tx1.configure(yscrollcommand=scr1.set, state='disabled')
         self.tx1.pack(side=tk.LEFT)
@@ -51,14 +50,14 @@ class TkGui(tk.Tk):
         self.tx1.bind('<Leave>', self._unbound_to_mousewheel)
         scr1.pack(side=tk.RIGHT, fill=tk.Y)
         lab2 = ttk.LabelFrame(fra1, text='The second domain', labelanchor='n', borderwidth=5)
-        lab2.grid(row=2, column=0, pady=5, padx=5)
+        lab2.grid(row=1, column=0, pady=5, padx=5)
         but2 = ttk.Button(lab2, text='Add a range', command=self.seg2)
-        but2.grid(row=0, column=0, padx=10)
+        but2.grid(row=1, column=0, padx=10, pady=10)
         but22 = ttk.Button(lab2, text='Reset', command=self.sbros_2)
-        but22.grid(row=0, column=1, padx=10)
-        fra12 = ttk.Frame(fra1)
-        fra12.grid(row=3, column=0, pady=10, padx=10)
-        self.tx2 = tk.Text(fra12, width=30, height=5)
+        but22.grid(row=1, column=1, padx=10, pady=10)
+        fra12 = ttk.Frame(lab2)
+        fra12.grid(row=0, column=0, columnspan=2, pady=10, padx=10)
+        self.tx2 = tk.Text(fra12, width=40, height=5)
         scr2 = ttk.Scrollbar(fra12, command=self.tx2.yview)
         self.tx2.configure(yscrollcommand=scr2.set, state='disabled')
         self.tx2.pack(side=tk.LEFT)
@@ -178,16 +177,16 @@ class TkGui(tk.Tk):
         except ValueError:
             showerror('Error', 'Statistics unavailable')
             return
-        showinfo('Statistics', 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} пc)\n'
-                               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} пc)\n'
+        showinfo('Statistics', 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} ps)\n'
+                               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} ps)\n'
                                'The average distance between domains = {4:.3f} \u212b\n'
                                'The standard deviation = {5:.3f} \u212b\n'
                                'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
                                '(75%) = {8:.3f} \u212b'.format(
             r_min, t_min, r_max, t_max, r_mean, std, perc_25, median, perc_75))
         self.tx.configure(state='normal')
-        self.tx.insert(tk.END, 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} пc)\n'
-                               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} пc)\n'
+        self.tx.insert(tk.END, 'The minimum distance between domains = {0:.3f} \u212b (t= {1:.2f} ps)\n'
+                               'The maximum distance between domains = {2:.3f} \u212b (t= {3:.2f} ps)\n'
                                'The average distance between domains= {4:.3f} \u212b\n'
                                'The standard deviation= {5:.3f} \u212b\n'
                                'Quartiles: (25%) = {6:.3f} \u212b, (50%) = {7:.3f} \u212b, '
@@ -207,20 +206,13 @@ class TkGui(tk.Tk):
         while n_cluster is None:
             n_cluster = askinteger('Number of clusters', 'Enter the number of clusters (0-auto, MeanShift)')
         try:
-            xhist, yhist, si_score, std_dev = self.app.cluster(n_cluster)
+            xhist, yhist, si_score, calinski, std_dev, fig = self.app.cluster(n_cluster, self.grid)
         except ImportError:
             showerror('Error!', 'Scikit-learn is not installed!')
             return
         except (NameError, ValueError):
             showerror('Error!', 'Data unavailable')
             return
-        fig = Figure()
-        ax = fig.add_subplot(111)
-        ax.set_title('Clustering')
-        ax.set_ylabel(r'$\% \ \tau$')
-        ax.set_xlabel(r'$\xi,\ \AA$')
-        ax.grid(self.grid)
-        ax.bar(xhist.flatten(), yhist, width=[3 * x for x in std_dev], align='center')
         win_cls = tk.Toplevel(self)
         win_cls.title("Clustering {:s}".format('MeanShift' if n_cluster == 0 else 'KMeans'))
         win_cls.minsize(width=640, height=600)
@@ -242,11 +234,19 @@ class TkGui(tk.Tk):
         scr.pack(side=tk.RIGHT, fill=tk.Y)
         tx.configure(state='normal')
         tx.insert(tk.END, 'The number of clusters = {0:d}\nSilhouette Coefficient = {1:.2f}\n'
-                          '(The best value is 1 and the worst value is -1.\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          'The best value is 1 and the worst value is -1.\n'
                           'Values near 0 indicate overlapping clusters.\n'
                           'Negative values generally indicate that a sample has been assigned\n'
-                          'to the wrong cluster, as a different cluster is more similar.'
-                          ')\nClusters:'.format(len(xhist), si_score))
+                          'to the wrong cluster, as a different cluster is more similar.\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          'Calinski-Harabaz score = {2:.2f}\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          'Calinski-Harabaz score is defined as ratio between\n'
+                          'the within-cluster dispersion\n'
+                          'and the between-cluster dispersion. (-1 for only one cluster)\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          'Clusters:'.format(len(xhist), si_score, calinski))
         for n, cls_center in enumerate(xhist.flatten()):
             tx.insert(tk.END,
                       '\nCluster No {0:d}: points of the trajectory {1:.1f} %,'
@@ -268,6 +268,9 @@ class TkGui(tk.Tk):
         sa = asksaveasfilename(**opt)
         try:
             self.app.save(sa)
+        except BadExtError:
+            showerror('Error!', 'Unsupported file format!')
+            return
         except OSError:
             showerror('Error!', 'Failed to save {0:s}'.format(sa))
             return
@@ -280,9 +283,7 @@ class TkGui(tk.Tk):
         except XLWTImportError:
             showerror('Error!', 'xlwt is not installed! Saving in Microsoft Excel 97-2003 impossible!')
             return
-        except BadExtError:
-            showerror('Error!', 'Unsupported file format!')
-            return
+
 
     def save_log(self):
         """
@@ -310,8 +311,8 @@ class TkGui(tk.Tk):
             showerror('Error!', 'Plot unavailable!')
             return
         opt = {'parent': self, 'filetypes': [('All supported formats', (
-               '.eps', '.jpeg', '.jpg', '.pdf', '.pgf', '.png', '.ps', '.raw', '.rgba', '.svg', '.svgz', '.tif',
-               '.tiff')), ], 'initialfile': 'myfile.png', 'title': 'Save plot'}
+            '.eps', '.jpeg', '.jpg', '.pdf', '.pgf', '.png', '.ps', '.raw', '.rgba', '.svg', '.svgz', '.tif',
+            '.tiff')), ], 'initialfile': 'myfile.png', 'title': 'Save plot'}
         sa = asksaveasfilename(**opt)
         if sa:
             try:
@@ -338,7 +339,7 @@ class TkGui(tk.Tk):
         except AttributeError:
             pass
         try:
-            self._graph()
+            self.graph()
         except AttributeError:
             pass
 
@@ -356,7 +357,7 @@ class TkGui(tk.Tk):
         except AttributeError:
             pass
         try:
-            self._graph()
+            self.graph()
         except AttributeError:
             pass
 
@@ -376,32 +377,18 @@ class TkGui(tk.Tk):
         except AttributeError:
             pass
         try:
-            self._graph()
+            self.graph()
         except AttributeError:
             pass
 
-    def _graph(self):
+    def graph(self):
         self.fig = None
-        self.fig = Figure()
-        ax = self.fig.add_subplot(111)
-        x, y, ysg = self.app.getgraphdata()
-        ax.set_title('COM distance vs. time')
-        ax.set_ylabel(r'$\xi,\ \AA$')
-        if (max(x) - min(x)) > 10000:
-            ax.set_xlabel(r'$Time,\ ns$')
-            x /= 1000
-        else:
-            ax.set_xlabel(r'$Time,\ ps$')
-        ax.plot(x, y, color='black', label='Raw COM distance')
-        if self.smoth:
-            if len(ysg) == len(x):
-                ax.plot(x, ysg, 'r', label='Filtered COM distance')
-            else:
-                showerror('Error!', 'It is not possible to perform smoothing!')
-                self.smoth = False
-        ax.grid(self.grid)
-        if self.legend:
-            ax.legend(loc='best', frameon=False)
+        try:
+            self.fig = self.app.getgraphdata(smoth=self.smoth, grid=self.grid, legend=self.legend)
+        except SmothPlotError:
+            showerror('Error!', 'It is not possible to perform smoothing!')
+            self.smoth = False
+            self.graph()
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.fra2)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
@@ -563,17 +550,18 @@ class TkGui(tk.Tk):
                 if t is not None:
                     self.tx.insert(tk.END, 'At t = {0:.3f} {1:s}\n'.format(
                         t if t < 1000 else t / 1000, "ps" if t < 1000 else "ns"))
-                self.tx.insert(tk.END, 'Coordinates of the center of mass of the first domain:'
-                               'C1 ({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)\n'
-                               'the second domain: C2({3: .3f} \u212b, {4: .3f} \u212b, {5: .3f} \u212b\n'
-                               'the distance between domains: {6:.3f} \u212b\n').format(
-                               c_mass_1[0], c_mass_1[1], c_mass_1[2], c_mass_2[0], c_mass_2[1], c_mass_2[2], r)
+                self.tx.insert(tk.END, ('Coordinates of the center of mass of the first domain:'
+                                        'C1({0:.3f} \u212b, {1:.3f} \u212b, {2:.3f} \u212b)\n'
+                                        'the second domain: C2({3: .3f} \u212b, {4: .3f} \u212b, {5: .3f} \u212b)\n'
+                                        'the distance between domains: {6:.3f} \u212b\n').format(
+                    c_mass_1[0], c_mass_1[1], c_mass_1[2], c_mass_2[0], c_mass_2[1], c_mass_2[2], r))
                 self.tx.configure(state='disabled')
                 self.pb['value'] = n
                 self.pb.update()
                 if self.stop_flag:
                     self.run_flag = False
                     break
+
         except NoDataFor1stDom:
             showerror('Error!', 'Data for the first domain was not collected!')
             showinfo('Attention!', 'Residues ranges was not cleaned!')
@@ -602,6 +590,7 @@ class TkGui(tk.Tk):
                     self.toolbar.destroy()
                 except AttributeError:
                     pass
-                self._graph()
+                self.graph()
         self.all_res = True
+        self.run_flag = False
         showinfo('Attention!', 'Residues ranges was not cleaned!')

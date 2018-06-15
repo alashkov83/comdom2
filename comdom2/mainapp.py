@@ -12,6 +12,7 @@ from functools import lru_cache
 from math import factorial
 
 import numpy as np
+from matplotlib.figure import Figure
 from periodictable import formula
 
 
@@ -110,6 +111,10 @@ class DataNotObserved(ValueError):
     pass
 
 
+class SmothPlotError(ValueError):
+    pass
+
+
 class App:
     """Class of program logic"""
 
@@ -134,7 +139,7 @@ class App:
 
     @staticmethod
     @lru_cache()
-    def _mass(element: str) -> float:
+    def mass(element: str) -> float:
         """The mass of the atom. Use a dictionary for frequently types of atoms accelerates calculations."""
         elements = {
             ' H': 1.0,
@@ -163,7 +168,7 @@ class App:
         perc_75 = np.percentile(r, 75)
         return r_min, r_max, r_mean, t_min, t_max, std, perc_25, median, perc_75
 
-    def cluster(self, n_cluster):
+    def cluster(self, n_cluster, grid=True):
         """
 
         :param n_cluster:
@@ -172,7 +177,7 @@ class App:
         # Scikit - learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825 - 2830, 2011.
         from sklearn.cluster import MeanShift
         from sklearn.cluster import KMeans
-        from sklearn.metrics import silhouette_score
+        from sklearn.metrics import silhouette_score, calinski_harabaz_score
         if self.nparray is None:
             raise ValueError
         r = self.nparray[:, 1]
@@ -192,13 +197,22 @@ class App:
         # to the wrong cluster, as a different cluster is more similar.
         if len(ap.cluster_centers_) > 1:
             si_score = silhouette_score(r.reshape(-1, 1), ap.labels_)
+            calinski = calinski_harabaz_score(r.reshape(-1, 1), ap.labels_)
         else:
             si_score = 1.0
+            calinski = -1
         zipped = list(zip(r.flatten(), ap.labels_))
         std_dev = []
         for n in range(len(ap.cluster_centers_)):
             std_dev.append(np.std([x[0] for x in zipped if x[1] == n]))
-        return xhist, yhist, si_score, std_dev
+        fig = Figure()
+        ax = fig.add_subplot(111)
+        ax.set_title('Clustering')
+        ax.set_ylabel(r'$\% \ \tau$')
+        ax.set_xlabel(r'$\xi,\ \AA$')
+        ax.grid(grid)
+        ax.bar(xhist.flatten(), yhist, width=[3 * x for x in std_dev], align='center')
+        return xhist, yhist, si_score, calinski, std_dev, fig
 
     def save(self, sa):
         """
@@ -243,7 +257,7 @@ class App:
             else:
                 raise BadExtError
 
-    def getgraphdata(self):
+    def getgraphdata(self, smoth=True, grid=True, legend=True):
         """
 
         :return:
@@ -251,7 +265,25 @@ class App:
         x = self.nparray[:, 0]
         y = self.nparray[:, 1]
         ysg = savitzky_golay(y, window_size=31, order=4)
-        return x, y, ysg
+        fig = Figure()
+        ax = fig.add_subplot(111)
+        ax.set_title('COM distance vs. time')
+        ax.set_ylabel(r'$\xi,\ \AA$')
+        if (max(x) - min(x)) > 10000:
+            ax.set_xlabel(r'$Time,\ ns$')
+            x = x / 1000
+        else:
+            ax.set_xlabel(r'$Time,\ ps$')
+        ax.plot(x, y, color='black', label='Raw COM distance')
+        if smoth:
+            if len(ysg) == len(x):
+                ax.plot(x, ysg, 'r', label='Filtered COM distance')
+            else:
+                raise SmothPlotError
+        ax.grid(grid)
+        if legend:
+            ax.legend(loc='best', frameon=False)
+        return fig
 
     def open_pdb(self, filename):
         """
@@ -284,13 +316,13 @@ class App:
             elif (s[0:6] == 'ATOM  ') and ((s[21], int(s[22:26])) in self.segment_1) and (
                     (all_res is True) or ((str(s[17:20]) in hydrfob) or (str(s[17:20]) not in all_aa))):
                 xyzm_1 = [float(s[30:38]), float(s[38:46]),
-                          float(s[46:54]), self._mass(s[76:78])]
-                xyzm_array_1 = np.hstack((xyzm_array_1, xyzm_1))
+                          float(s[46:54]), self.mass(s[76:78])]
+                xyzm_array_1 = np.concatenate((xyzm_array_1, xyzm_1))
             elif (s[0:6] == 'ATOM  ') and ((s[21], int(s[22:26])) in self.segment_2) and (
                     (all_res is True) or ((str(s[17:20]) in hydrfob) or (str(s[17:20]) not in all_aa))):
                 xyzm_2 = [float(s[30:38]), float(s[38:46]),
-                          float(s[46:54]), self._mass(s[76:78])]
-                xyzm_array_2 = np.hstack((xyzm_array_2, xyzm_2))
+                          float(s[46:54]), self.mass(s[76:78])]
+                xyzm_array_2 = np.concatenate((xyzm_array_2, xyzm_2))
             elif s[0:6] == 'ENDMDL' or (s[0:3] == 'END' and model_flag is False):
                 try:
                     xyzm_array_1.shape = (-1, 4)
