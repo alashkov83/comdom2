@@ -234,18 +234,18 @@ class TkGui(tk.Tk):
         scr.pack(side=tk.RIGHT, fill=tk.Y)
         tx.configure(state='normal')
         tx.insert(tk.END, 'The number of clusters = {0:d}\nSilhouette Coefficient = {1:.2f}\n'
-                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
                           'The best value is 1 and the worst value is -1.\n'
                           'Values near 0 indicate overlapping clusters.\n'
                           'Negative values generally indicate that a sample has been assigned\n'
                           'to the wrong cluster, as a different cluster is more similar.\n'
-                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
                           'Calinski-Harabaz score = {2:.2f}\n'
-                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
                           'Calinski-Harabaz score is defined as ratio between\n'
                           'the within-cluster dispersion\n'
                           'and the between-cluster dispersion. (-1 for only one cluster)\n'
-                          '++++++++++++++++++++++++++++++++++++++++++++++\n'
+                          '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
                           'Clusters:'.format(len(xhist), si_score, calinski))
         for n, cls_center in enumerate(xhist.flatten()):
             tx.insert(tk.END,
@@ -293,7 +293,7 @@ class TkGui(tk.Tk):
         if sa:
             letter = self.tx.get(1.0, tk.END)
             try:
-                with open(sa, 'w') as f:
+                with open(sa, 'w', encoding='utf-8') as f:
                     f.write(letter)
             except FileNotFoundError:
                 pass
