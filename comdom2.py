@@ -6,6 +6,7 @@
 
 """
 import argparse
+import sys
 
 
 class Parser(argparse.ArgumentParser):
@@ -23,7 +24,7 @@ class Parser(argparse.ArgumentParser):
         self.add_argument('-i', '--input', type=str, default='', help='Input file name (pdb)')
         self.add_argument('-s1', '--segment1', type=str, help='Ranges of residues in domain No 1')
         self.add_argument('-s2', '--segment2', type=str, help='Ranges of residues in domain No 2')
-        self.add_argument('-g', '--gui', choices=['tkgui', 'cli'], type=str, default='tkgui', help='UI modes')
+        self.add_argument('-g', '--gui', choices=['tkgui', 'cli', 'qtgui'], type=str, default='tkgui', help='UI modes')
         self.add_argument('-hd', '--hydrofob', action='store_const', const=True, default=False,
                           help='Only hydrophobic residues.')
         self.add_argument('-n', '--n_cluster', type=int, default=0,
@@ -47,3 +48,14 @@ if __name__ == '__main__':
     elif namespace.gui == 'cli':
         from comdom2.cli import Cli
         cli = Cli(namespace)
+    elif namespace.gui == 'qtgui':
+        try:
+            from PyQt5.QtWidgets import QApplication
+        except ImportError:
+            print("Error! PyQt5 is not installed!")
+            sys.exit(-1)
+        from comdom2.qtgui import QtGui
+        app = QApplication(["", ])
+        ap = QtGui(namespace)
+        sys.exit(app.exec_())
+
