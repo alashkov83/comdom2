@@ -130,7 +130,7 @@ class App:
         """Calculate the position of the center of mass."""
         center = np.average(str_nparray[:, 0:3], axis=0, weights=str_nparray[:, 3])
         return center
-    
+
     @staticmethod
     @lru_cache()
     def mass(element: str) -> float:
