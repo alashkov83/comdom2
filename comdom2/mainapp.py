@@ -126,17 +126,11 @@ class App:
         self.all_res = True
 
     @staticmethod
-    def _cmass(str_nparray: np.ndarray) -> list:
-        """Compute the position of the center of mass"""
-        mass_sum = float(str_nparray[:, 3].sum())
-        mx = (str_nparray[:, 3]) * (str_nparray[:, 0])
-        my = (str_nparray[:, 3]) * (str_nparray[:, 1])
-        mz = (str_nparray[:, 3]) * (str_nparray[:, 2])
-        c_mass_x = float(mx.sum()) / mass_sum
-        c_mass_y = float(my.sum()) / mass_sum
-        c_mass_z = float(mz.sum()) / mass_sum
-        return [c_mass_x, c_mass_y, c_mass_z]
-
+    def cmass(str_nparray: np.ndarray) -> list:
+        """Calculate the position of the center of mass."""
+        center = np.average(str_nparray[:, 0:3], axis=0, weights=str_nparray[:, 3])
+        return center
+    
     @staticmethod
     @lru_cache()
     def mass(element: str) -> float:
