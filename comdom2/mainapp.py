@@ -126,7 +126,7 @@ class App:
         self.all_res = True
 
     @staticmethod
-    def cmass(str_nparray: np.ndarray) -> list:
+    def _cmass(str_nparray: np.ndarray) -> list:
         """Calculate the position of the center of mass."""
         center = np.average(str_nparray[:, 0:3], axis=0, weights=str_nparray[:, 3])
         return center
