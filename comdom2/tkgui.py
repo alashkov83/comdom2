@@ -16,7 +16,11 @@ from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askinteger
 from tkinter.simpledialog import askstring
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+try:
+    from matplotlib.backends.backend_tkagg import NavigationToolbar2TkAgg
+except ImportError:
+    from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk as NavigationToolbar2TkAgg
 
 from .joke import joke
 from .mainapp import App, XLSWImportError, XLWTImportError, BadExtError, NoDataFor1stDom, NoDataFor2ndDom, \
@@ -563,7 +567,6 @@ class TkGui(tk.Tk):
                 if self.stop_flag:
                     self.run_flag = False
                     break
-
         except NoDataFor1stDom:
             showerror('Error!', 'Data for the first domain was not collected!')
             showinfo('Attention!', 'Residues ranges was not cleaned!')
